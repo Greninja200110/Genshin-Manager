@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>原神数据管理</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div>
+          <div class="brand-title">原神数据管理</div>
+          <div class="brand-sub">Genshin Manager</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="overview">总览</button>
+        <button class="nav-item" data-view="characters">角色</button>
+        <button class="nav-item" data-view="weapons">武器</button>
+        <button class="nav-item" data-view="artifacts">圣遗物</button>
+        <button class="nav-item" data-view="wishes">抽卡</button>
+        <button class="nav-item" data-view="import">导入/导出</button>
+      </nav>
+
+      <div class="uid-box">
+        <label for="uidInput">UID</label>
+        <input id="uidInput" placeholder="输入UID" />
+        <button id="saveUid" class="btn small">保存</button>
+      </div>
+
+      <div class="footer">本地离线存储 · 不会上传数据</div>
+    </aside>
+
+    <main class="content">
+      <section class="view active" id="view-overview">
+        <div class="section-head">
+          <h1>总览</h1>
+          <div class="meta" id="metaUpdated">最后更新：-</div>
+        </div>
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="charts-grid">
+          <div class="card">
+            <div class="card-title">抽卡类型分布</div>
+            <canvas id="chartWishType"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-title">星级分布</div>
+            <canvas id="chartWishRarity"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-title">抽卡趋势（月）</div>
+            <canvas id="chartWishTrend"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-characters">
+        <div class="section-head">
+          <h1>角色</h1>
+          <div class="actions">
+            <input id="charSearch" class="search" placeholder="搜索角色" />
+            <select id="charElementFilter">
+              <option value="all">全部元素</option>
+              <option value="火">火</option>
+              <option value="水">水</option>
+              <option value="雷">雷</option>
+              <option value="冰">冰</option>
+              <option value="风">风</option>
+              <option value="岩">岩</option>
+              <option value="草">草</option>
+              <option value="未知">未知</option>
+            </select>
+            <select id="charRarityFilter">
+              <option value="all">全部星级</option>
+              <option value="5">5★</option>
+              <option value="4">4★</option>
+              <option value="3">3★</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid" id="charGrid"></div>
+        <div class="form-card">
+          <h2>快速添加</h2>
+          <div class="form-row">
+            <input id="charName" placeholder="角色名" />
+            <select id="charElement">
+              <option value="">元素</option>
+              <option value="火">火</option>
+              <option value="水">水</option>
+              <option value="雷">雷</option>
+              <option value="冰">冰</option>
+              <option value="风">风</option>
+              <option value="岩">岩</option>
+              <option value="草">草</option>
+            </select>
+            <input id="charLevel" placeholder="等级" type="number" />
+            <input id="charConst" placeholder="命座" type="number" />
+            <input id="charFriend" placeholder="好感" type="number" />
+            <button id="addChar" class="btn">添加</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-weapons">
+        <div class="section-head">
+          <h1>武器</h1>
+          <div class="actions">
+            <input id="weaponSearch" class="search" placeholder="搜索武器" />
+            <select id="weaponTypeFilter">
+              <option value="all">全部类型</option>
+              <option value="单手剑">单手剑</option>
+              <option value="双手剑">双手剑</option>
+              <option value="法器">法器</option>
+              <option value="长柄武器">长柄武器</option>
+              <option value="弓">弓</option>
+              <option value="未知">未知</option>
+            </select>
+            <select id="weaponRarityFilter">
+              <option value="all">全部星级</option>
+              <option value="5">5★</option>
+              <option value="4">4★</option>
+              <option value="3">3★</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid" id="weaponGrid"></div>
+        <div class="form-card">
+          <h2>快速添加</h2>
+          <div class="form-row">
+            <input id="weaponName" placeholder="武器名" />
+            <select id="weaponType">
+              <option value="">类型</option>
+              <option value="单手剑">单手剑</option>
+              <option value="双手剑">双手剑</option>
+              <option value="法器">法器</option>
+              <option value="长柄武器">长柄武器</option>
+              <option value="弓">弓</option>
+            </select>
+            <input id="weaponLevel" placeholder="等级" type="number" />
+            <input id="weaponRefine" placeholder="精炼" type="number" />
+            <input id="weaponOwner" placeholder="装备角色" />
+            <button id="addWeapon" class="btn">添加</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-artifacts">
+        <div class="section-head">
+          <h1>圣遗物</h1>
+          <div class="actions">
+            <input id="artifactSearch" class="search" placeholder="搜索圣遗物" />
+          </div>
+        </div>
+        <div class="grid" id="artifactGrid"></div>
+        <div class="form-card">
+          <h2>快速添加</h2>
+          <div class="form-row">
+            <input id="artifactName" placeholder="圣遗物名" />
+            <input id="artifactSet" placeholder="套装" />
+            <input id="artifactSlot" placeholder="部位" />
+            <input id="artifactMain" placeholder="主词条" />
+            <input id="artifactLevel" placeholder="等级" type="number" />
+            <input id="artifactOwner" placeholder="装备角色" />
+            <button id="addArtifact" class="btn">添加</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-wishes">
+        <div class="section-head">
+          <h1>抽卡记录</h1>
+          <div class="actions">
+            <input id="wishSearch" class="search" placeholder="搜索记录" />
+          </div>
+        </div>
+        <div class="filter-bar">
+          <select id="wishPool">
+            <option value="all">全部卡池</option>
+            <option value="角色池">角色池</option>
+            <option value="武器池">武器池</option>
+            <option value="常驻池">常驻池</option>
+            <option value="集录祈愿">集录祈愿</option>
+          </select>
+          <select id="wishItemType">
+            <option value="all">全部类型</option>
+            <option value="角色">角色</option>
+            <option value="武器">武器</option>
+          </select>
+          <div class="checkbox-group">
+            <label><input type="checkbox" class="wishRarity" value="3" checked />3★</label>
+            <label><input type="checkbox" class="wishRarity" value="4" checked />4★</label>
+            <label><input type="checkbox" class="wishRarity" value="5" checked />5★</label>
+          </div>
+        </div>
+        <div class="wish-toolbar">
+          <button id="exportWishes" class="btn ghost">导出抽卡记录</button>
+          <button id="clearWishes" class="btn ghost danger">清空抽卡记录</button>
+        </div>
+        <div class="table" id="wishTable"></div>
+        <div class="form-card">
+          <h2>快速添加</h2>
+          <div class="form-row">
+            <input id="wishItem" placeholder="物品名" />
+            <input id="wishType" placeholder="卡池类型" />
+            <input id="wishRarity" placeholder="星级(3/4/5)" type="number" />
+            <input id="wishTime" placeholder="时间 2024-01-01 12:00" />
+            <button id="addWish" class="btn">添加</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-import">
+        <div class="section-head">
+          <h1>导入 / 导出</h1>
+        </div>
+        <div class="import-grid">
+          <div class="card">
+            <div class="card-title">导入数据</div>
+            <p class="muted">支持完整数据或抽卡记录 JSON。可直接粘贴或上传文件。</p>
+            <input type="file" id="importFile" accept=".json" />
+            <textarea id="importText" placeholder="粘贴JSON"></textarea>
+            <div class="actions">
+              <button id="importBtn" class="btn">导入</button>
+              <button id="resetDemo" class="btn ghost">载入示例数据</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">导出数据</div>
+            <p class="muted">导出完整数据备份。</p>
+            <button id="exportBtn" class="btn">导出 JSON</button>
+            <div class="export-preview">
+              <pre id="exportPreview"></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="detailModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">×</button>
+      <div id="detailBody"></div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
